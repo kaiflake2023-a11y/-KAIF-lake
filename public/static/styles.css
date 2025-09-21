@@ -1,0 +1,153 @@
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #17212b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2f3a45;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3d4a57;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2f3a45 #17212b;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Message bubbles */
+.message-bubble {
+  word-break: break-word;
+  max-width: 70%;
+}
+
+/* Hover effects */
+.chat-item:hover {
+  transition: background-color 0.2s ease;
+}
+
+/* Input focus styles */
+input:focus, textarea:focus {
+  transition: border-color 0.2s ease;
+}
+
+/* Button transitions */
+button {
+  transition: all 0.2s ease;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom message styles */
+.message-own {
+  background: linear-gradient(135deg, #0088cc 0%, #0077b5 100%);
+}
+
+.message-other {
+  background: #17212b;
+}
+
+/* Status indicators */
+.online-indicator {
+  width: 10px;
+  height: 10px;
+  background: #4CAF50;
+  border-radius: 50%;
+  border: 2px solid #17212b;
+}
+
+.offline-indicator {
+  width: 10px;
+  height: 10px;
+  background: #757575;
+  border-radius: 50%;
+  border: 2px solid #17212b;
+}
+
+/* Typing indicator */
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  background: #0088cc;
+  border-radius: 50%;
+  display: inline-block;
+  animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 80%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .chat-view {
+    width: 100%;
+  }
+}
