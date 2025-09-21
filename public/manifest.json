@@ -1,7 +1,7 @@
 {
-  "name": "Кайф Озеро Мессенджер",
-  "short_name": "Кайф Озеро",
-  "description": "Быстрый и безопасный мессенджер",
+  "name": "KAIF LAKE - Экосистема",
+  "short_name": "KAIF LAKE",
+  "description": "Децентрализованная экосистема: мессенджер, криптокошелек, NFT, маркетплейс",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0e1621",

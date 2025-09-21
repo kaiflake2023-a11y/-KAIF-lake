@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KAIF LAKE Icon Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+            font-family: sans-serif;
+        }
+        .icon-preview {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            background: white;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>KAIF LAKE Icons</h1>
+    <div id="icons"></div>
+
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const container = document.getElementById('icons');
+
+        sizes.forEach(size => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'icon-preview';
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#0088cc');
+            gradient.addColorStop(0.5, '#00a8ff');
+            gradient.addColorStop(1, '#0066aa');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Draw wave/spiral logo
+            const centerX = size / 2;
+            const centerY = size * 0.35;
+            const radius = size * 0.25;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            
+            // Outer wave
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Inner spiral design
+            ctx.beginPath();
+            ctx.strokeStyle = '#0088cc';
+            ctx.lineWidth = radius * 0.15;
+            ctx.arc(0, 0, radius * 0.6, -Math.PI * 0.5, Math.PI);
+            ctx.stroke();
+            
+            // Inner circle
+            ctx.beginPath();
+            ctx.fillStyle = '#0088cc';
+            ctx.arc(radius * 0.2, radius * 0.1, radius * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+            
+            // Text "KAIF"
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.18}px Inter, Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('KAIF', centerX, size * 0.68);
+            
+            // Text "LAKE"
+            ctx.font = `${size * 0.08}px Inter, Arial, sans-serif`;
+            ctx.letterSpacing = `${size * 0.02}px`;
+            ctx.fillText('L A K E', centerX, size * 0.82);
+            
+            // Add label
+            const label = document.createElement('div');
+            label.textContent = `${size}x${size}`;
+            
+            // Add download link
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = `icon-${size}x${size}.png`;
+            link.textContent = 'Download';
+            link.style.display = 'block';
+            link.style.marginTop = '5px';
+            
+            wrapper.appendChild(canvas);
+            wrapper.appendChild(label);
+            wrapper.appendChild(link);
+            container.appendChild(wrapper);
+        });
+    </script>
+</body>
+</html>

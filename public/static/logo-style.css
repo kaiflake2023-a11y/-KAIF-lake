@@ -1,0 +1,128 @@
+/* KAIF LAKE Logo Styles */
+.kaif-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.kaif-logo:hover {
+  transform: scale(1.05);
+}
+
+.kaif-logo-icon {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kaif-logo-wave {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0088cc 0%, #00a8ff 50%, #0088cc 100%);
+  position: relative;
+  overflow: hidden;
+  animation: wave-rotate 8s linear infinite;
+}
+
+.kaif-logo-wave::before {
+  content: '';
+  position: absolute;
+  width: 70%;
+  height: 70%;
+  border-radius: 45%;
+  background: white;
+  top: 15%;
+  left: 15%;
+  opacity: 0.3;
+  animation: wave-pulse 3s ease-in-out infinite;
+}
+
+.kaif-logo-wave::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%);
+  top: 25%;
+  left: 25%;
+  animation: wave-inner 4s ease-in-out infinite;
+}
+
+.kaif-logo-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+.kaif-logo-main {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #0088cc 0%, #00a8ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.kaif-logo-sub {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: #666;
+  margin-top: 2px;
+  margin-left: 1px;
+}
+
+/* Dark theme support */
+.dark .kaif-logo-wave {
+  background: linear-gradient(135deg, #00a8ff 0%, #66c3ff 50%, #00a8ff 100%);
+}
+
+.dark .kaif-logo-sub {
+  color: #999;
+}
+
+/* Animations */
+@keyframes wave-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes wave-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.5; }
+}
+
+@keyframes wave-inner {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(0.9) rotate(180deg); }
+}
+
+/* Compact version for header */
+.kaif-logo-compact {
+  gap: 8px;
+}
+
+.kaif-logo-compact .kaif-logo-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.kaif-logo-compact .kaif-logo-main {
+  font-size: 18px;
+}
+
+.kaif-logo-compact .kaif-logo-sub {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+}

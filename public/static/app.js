@@ -236,9 +236,17 @@ function renderAuthScreen() {
     <div class="flex items-center justify-center h-screen bg-telegram-bg">
       <div class="w-full max-w-md p-8">
         <div class="text-center mb-8">
-          <i class="fas fa-comment-dots text-6xl text-telegram-accent mb-4"></i>
-          <h1 class="text-3xl font-bold">Кайф Озеро</h1>
-          <p class="text-telegram-secondary mt-2">Простой и быстрый мессенджер</p>
+          <div class="kaif-logo mx-auto justify-center mb-4" style="transform: scale(1.5);">
+            <div class="kaif-logo-icon">
+              <div class="kaif-logo-wave"></div>
+            </div>
+            <div class="kaif-logo-text">
+              <div class="kaif-logo-main">KAIF</div>
+              <div class="kaif-logo-sub">LAKE</div>
+            </div>
+          </div>
+          <p class="text-telegram-secondary mt-4">Децентрализованная экосистема будущего</p>
+          <p class="text-xs text-telegram-secondary mt-1">Мессенджер • Криптокошелек • NFT • Маркетплейс</p>
         </div>
         
         <div id="auth-form" class="bg-telegram-sidebar rounded-lg p-6">
@@ -334,7 +342,15 @@ function renderMainInterface() {
               <i class="fas ${app.menuOpen ? 'fa-times' : 'fa-bars'} text-telegram-text"></i>
             </button>
             ${app.menuOpen ? `
-              <h1 class="text-lg font-semibold">Кайф Озеро</h1>
+              <div class="kaif-logo kaif-logo-compact">
+                <div class="kaif-logo-icon">
+                  <div class="kaif-logo-wave"></div>
+                </div>
+                <div class="kaif-logo-text">
+                  <div class="kaif-logo-main">KAIF</div>
+                  <div class="kaif-logo-sub">LAKE</div>
+                </div>
+              </div>
               <button onclick="showSearchModal()" class="p-2 hover:bg-telegram-hover rounded">
                 <i class="fas fa-search text-telegram-secondary"></i>
               </button>
@@ -1022,7 +1038,15 @@ function renderComingSoonView(feature) {
               <i class="fas ${app.menuOpen ? 'fa-times' : 'fa-bars'} text-telegram-text"></i>
             </button>
             ${app.menuOpen ? `
-              <h1 class="text-lg font-semibold">Кайф Озеро</h1>
+              <div class="kaif-logo kaif-logo-compact">
+                <div class="kaif-logo-icon">
+                  <div class="kaif-logo-wave"></div>
+                </div>
+                <div class="kaif-logo-text">
+                  <div class="kaif-logo-main">KAIF</div>
+                  <div class="kaif-logo-sub">LAKE</div>
+                </div>
+              </div>
               <button onclick="showSearchModal()" class="p-2 hover:bg-telegram-hover rounded">
                 <i class="fas fa-search text-telegram-secondary"></i>
               </button>
