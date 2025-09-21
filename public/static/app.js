@@ -10,7 +10,9 @@ const app = {
   chats: [],
   messages: [],
   contacts: [],
-  pollInterval: null
+  pollInterval: null,
+  currentView: 'chats', // текущий раздел приложения
+  menuOpen: false
 };
 
 // API configuration
@@ -102,6 +104,10 @@ async function initializeApp() {
     
     // Start polling for new messages
     startPolling();
+    
+    // Set default view to chats
+    app.currentView = 'chats';
+    app.menuOpen = true; // Start with menu open
     
     // Render main interface
     renderMainInterface();
@@ -319,46 +325,57 @@ async function handleRegister(event) {
 function renderMainInterface() {
   const html = `
     <div class="flex h-screen">
-      <!-- Sidebar -->
-      <div class="w-80 bg-telegram-sidebar border-r border-telegram-border flex flex-col">
+      <!-- Enhanced Sidebar with Ecosystem Menu -->
+      <div class="${app.menuOpen ? 'w-80' : 'w-16'} bg-telegram-sidebar border-r border-telegram-border flex flex-col transition-all duration-300">
         <!-- Header -->
         <div class="p-4 border-b border-telegram-border">
-          <div class="flex items-center justify-between mb-3">
-            <button onclick="toggleMenu()" class="p-2 hover:bg-telegram-hover rounded">
-              <i class="fas fa-bars text-telegram-secondary"></i>
+          <div class="flex items-center ${app.menuOpen ? 'justify-between' : 'justify-center'}">
+            <button onclick="toggleMenu()" class="p-2 hover:bg-telegram-hover rounded" title="Меню">
+              <i class="fas ${app.menuOpen ? 'fa-times' : 'fa-bars'} text-telegram-text"></i>
             </button>
-            <h1 class="text-lg font-semibold">Кайф Озеро</h1>
-            <button onclick="showSearchModal()" class="p-2 hover:bg-telegram-hover rounded">
-              <i class="fas fa-search text-telegram-secondary"></i>
-            </button>
-          </div>
-          
-          <!-- User menu (hidden by default) -->
-          <div id="user-menu" class="hidden bg-telegram-bg rounded-lg p-3 mb-3">
-            <div class="flex items-center mb-3">
-              <div class="w-10 h-10 bg-telegram-accent rounded-full flex items-center justify-center mr-3">
-                <i class="fas fa-user"></i>
-              </div>
-              <div>
-                <div class="font-semibold">${app.user?.display_name || ''}</div>
-                <div class="text-sm text-telegram-secondary">@${app.user?.username || ''}</div>
-              </div>
-            </div>
-            <button onclick="logout()" class="w-full text-left py-2 px-3 hover:bg-telegram-hover rounded">
-              <i class="fas fa-sign-out-alt mr-2"></i> Выйти
-            </button>
+            ${app.menuOpen ? `
+              <h1 class="text-lg font-semibold">Кайф Озеро</h1>
+              <button onclick="showSearchModal()" class="p-2 hover:bg-telegram-hover rounded">
+                <i class="fas fa-search text-telegram-secondary"></i>
+              </button>
+            ` : ''}
           </div>
         </div>
         
-        <!-- Chat list -->
-        <div id="chat-list" class="flex-1 overflow-y-auto">
-          ${renderChatListContent()}
+        <!-- Ecosystem Menu -->
+        <div class="${app.menuOpen ? 'block' : 'hidden'} border-b border-telegram-border">
+          <nav class="p-2">
+            ${renderEcosystemMenu()}
+          </nav>
+        </div>
+        
+        <!-- User Info (when menu open) -->
+        ${app.menuOpen ? `
+          <div class="p-4 border-b border-telegram-border">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-telegram-accent rounded-full flex items-center justify-center mr-3">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="flex-1">
+                <div class="font-semibold text-sm">${app.user?.display_name || ''}</div>
+                <div class="text-xs text-telegram-secondary">@${app.user?.username || ''}</div>
+              </div>
+              <button onclick="logout()" class="p-2 hover:bg-telegram-hover rounded" title="Выйти">
+                <i class="fas fa-sign-out-alt text-telegram-secondary"></i>
+              </button>
+            </div>
+          </div>
+        ` : ''}
+        
+        <!-- Content based on current view -->
+        <div id="sidebar-content" class="flex-1 overflow-y-auto">
+          ${app.menuOpen ? renderSidebarContent() : renderCompactMenu()}
         </div>
       </div>
       
       <!-- Main content -->
       <div class="flex-1 flex flex-col">
-        ${app.currentChat ? renderChatView() : renderEmptyState()}
+        ${app.currentView === 'chats' ? (app.currentChat ? renderChatView() : renderEmptyState()) : ''}
       </div>
     </div>
     
@@ -554,10 +571,193 @@ function selectChat(chatId) {
 }
 
 function toggleMenu() {
-  const menu = document.getElementById('user-menu');
-  if (menu) {
-    menu.classList.toggle('hidden');
+  app.menuOpen = !app.menuOpen;
+  renderMainInterface();
+}
+
+// Render ecosystem menu items
+function renderEcosystemMenu() {
+  const menuItems = [
+    { id: 'chats', icon: 'fa-comments', label: 'Чаты', active: true, badge: app.chats.length },
+    { id: 'wallet', icon: 'fa-wallet', label: 'Кошелек', status: 'soon', color: 'text-yellow-400' },
+    { id: 'nft', icon: 'fa-image', label: 'NFT Маркет', status: 'soon', color: 'text-purple-400' },
+    { id: 'marketplace', icon: 'fa-shopping-cart', label: 'Маркетплейс', status: 'soon', color: 'text-green-400' },
+    { id: 'crowdfunding', icon: 'fa-hand-holding-usd', label: 'Краудфандинг', status: 'planned', color: 'text-blue-400' },
+    { id: 'library', icon: 'fa-book', label: 'Библиотека', status: 'planned', color: 'text-indigo-400' },
+    { id: 'freelance', icon: 'fa-briefcase', label: 'Биржа труда', status: 'planned', color: 'text-orange-400' },
+    { id: 'video', icon: 'fa-video', label: 'Видеозвонки', status: 'planned', color: 'text-red-400' },
+    { id: 'donate', icon: 'fa-heart', label: 'Донаты', status: 'planned', color: 'text-pink-400' }
+  ];
+  
+  return menuItems.map(item => `
+    <button 
+      onclick="switchView('${item.id}')"
+      class="w-full flex items-center justify-between p-3 mb-1 rounded-lg hover:bg-telegram-hover transition ${
+        app.currentView === item.id ? 'bg-telegram-active' : ''
+      } ${item.active ? '' : 'opacity-75'}"
+    >
+      <div class="flex items-center">
+        <i class="fas ${item.icon} ${item.color || 'text-telegram-accent'} w-5 mr-3"></i>
+        <span class="text-sm">${item.label}</span>
+      </div>
+      ${item.badge ? `
+        <span class="bg-telegram-accent text-xs px-2 py-1 rounded-full">${item.badge}</span>
+      ` : ''}
+      ${item.status === 'soon' ? `
+        <span class="text-xs bg-yellow-500 bg-opacity-20 text-yellow-400 px-2 py-0.5 rounded">скоро</span>
+      ` : ''}
+      ${item.status === 'planned' ? `
+        <span class="text-xs bg-gray-500 bg-opacity-20 text-gray-400 px-2 py-0.5 rounded">план</span>
+      ` : ''}
+    </button>
+  `).join('');
+}
+
+// Render compact menu when collapsed
+function renderCompactMenu() {
+  const menuItems = [
+    { id: 'chats', icon: 'fa-comments', active: true },
+    { id: 'wallet', icon: 'fa-wallet' },
+    { id: 'nft', icon: 'fa-image' },
+    { id: 'marketplace', icon: 'fa-shopping-cart' },
+    { id: 'video', icon: 'fa-video' }
+  ];
+  
+  return `
+    <div class="p-2">
+      ${menuItems.map(item => `
+        <button 
+          onclick="switchView('${item.id}')"
+          title="${item.id}"
+          class="w-full p-3 mb-2 rounded-lg hover:bg-telegram-hover transition ${
+            app.currentView === item.id ? 'bg-telegram-active' : ''
+          } ${item.active ? '' : 'opacity-50'}"
+        >
+          <i class="fas ${item.icon} text-telegram-accent"></i>
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
+// Switch between different views
+function switchView(viewId) {
+  app.currentView = viewId;
+  
+  // If view is not chats and not implemented yet, show coming soon
+  if (viewId !== 'chats') {
+    renderComingSoonView(viewId);
+  } else {
+    renderMainInterface();
   }
+}
+
+// Render sidebar content based on current view
+function renderSidebarContent() {
+  switch(app.currentView) {
+    case 'chats':
+      return renderChatListContent();
+    case 'wallet':
+      return renderWalletSidebar();
+    case 'nft':
+      return renderNFTSidebar();
+    case 'marketplace':
+      return renderMarketplaceSidebar();
+    default:
+      return renderChatListContent();
+  }
+}
+
+// Render wallet sidebar preview
+function renderWalletSidebar() {
+  return `
+    <div class="p-4">
+      <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg p-4 mb-4">
+        <div class="text-white text-sm opacity-90">Общий баланс</div>
+        <div class="text-white text-2xl font-bold">$0.00</div>
+      </div>
+      <div class="space-y-2">
+        <div class="bg-telegram-bg rounded-lg p-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-2">
+                <span class="text-white text-xs font-bold">TON</span>
+              </div>
+              <div>
+                <div class="text-sm">TON</div>
+                <div class="text-xs text-telegram-secondary">0 TON</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-telegram-bg rounded-lg p-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center mr-2">
+                <span class="text-white text-xs font-bold">ETH</span>
+              </div>
+              <div>
+                <div class="text-sm">Ethereum</div>
+                <div class="text-xs text-telegram-secondary">0 ETH</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Render NFT sidebar preview
+function renderNFTSidebar() {
+  return `
+    <div class="p-4">
+      <h3 class="text-sm font-semibold mb-3">Топ коллекции</h3>
+      <div class="space-y-2">
+        <div class="bg-telegram-bg rounded-lg p-3">
+          <div class="flex items-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg mr-3"></div>
+            <div>
+              <div class="text-sm font-semibold">CryptoKaif</div>
+              <div class="text-xs text-telegram-secondary">Floor: 0.5 TON</div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-telegram-bg rounded-lg p-3">
+          <div class="flex items-center">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-green-400 rounded-lg mr-3"></div>
+            <div>
+              <div class="text-sm font-semibold">Lake Arts</div>
+              <div class="text-xs text-telegram-secondary">Floor: 1.2 TON</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Render marketplace sidebar preview  
+function renderMarketplaceSidebar() {
+  return `
+    <div class="p-4">
+      <h3 class="text-sm font-semibold mb-3">Категории</h3>
+      <div class="space-y-1">
+        <button class="w-full text-left p-2 rounded hover:bg-telegram-hover">
+          <i class="fas fa-laptop mr-2 text-telegram-accent"></i> Электроника
+        </button>
+        <button class="w-full text-left p-2 rounded hover:bg-telegram-hover">
+          <i class="fas fa-tshirt mr-2 text-telegram-accent"></i> Одежда
+        </button>
+        <button class="w-full text-left p-2 rounded hover:bg-telegram-hover">
+          <i class="fas fa-book mr-2 text-telegram-accent"></i> Книги
+        </button>
+        <button class="w-full text-left p-2 rounded hover:bg-telegram-hover">
+          <i class="fas fa-palette mr-2 text-telegram-accent"></i> Услуги
+        </button>
+      </div>
+    </div>
+  `;
 }
 
 function showSearchModal() {
@@ -571,6 +771,307 @@ function hideSearchModal() {
 function showError(message) {
   // Simple error display - you can enhance this
   alert(message);
+}
+
+// Render coming soon view for features in development
+function renderComingSoonView(feature) {
+  const features = {
+    wallet: {
+      title: 'Криптокошелек',
+      icon: 'fa-wallet',
+      color: 'from-yellow-400 to-orange-500',
+      description: 'Управление криптовалютой прямо в мессенджере',
+      features: [
+        'Поддержка TON, BTC, ETH, USDT',
+        'P2P переводы между пользователями',
+        'Обмен криптовалют',
+        'Интеграция с DeFi протоколами',
+        'Стейкинг и farming'
+      ],
+      status: 'В разработке',
+      progress: 15
+    },
+    nft: {
+      title: 'NFT Маркетплейс',
+      icon: 'fa-image',
+      color: 'from-purple-400 to-pink-500',
+      description: 'Создавайте, покупайте и продавайте NFT',
+      features: [
+        'Минтинг NFT в один клик',
+        'Торговая площадка',
+        'Аукционы и торги',
+        'Коллекции и галереи',
+        'Интеграция с OpenSea'
+      ],
+      status: 'Планируется',
+      progress: 5
+    },
+    marketplace: {
+      title: 'Маркетплейс',
+      icon: 'fa-shopping-cart',
+      color: 'from-green-400 to-blue-500',
+      description: 'Покупайте и продавайте товары и услуги',
+      features: [
+        'Физические и цифровые товары',
+        'Безопасные сделки через escrow',
+        'Рейтинги и отзывы',
+        'Интеграция доставки',
+        'Криптовалютные платежи'
+      ],
+      status: 'Планируется',
+      progress: 10
+    },
+    crowdfunding: {
+      title: 'Краудфандинг',
+      icon: 'fa-hand-holding-usd',
+      color: 'from-blue-400 to-indigo-500',
+      description: 'Запускайте проекты и собирайте средства',
+      features: [
+        'Создание проектов',
+        'Система наград для бекеров',
+        'Прозрачное отслеживание средств',
+        'Smart contract гарантии',
+        'Возврат средств при неудаче'
+      ],
+      status: 'В планах',
+      progress: 0
+    },
+    library: {
+      title: 'Цифровая библиотека',
+      icon: 'fa-book',
+      color: 'from-indigo-400 to-purple-500',
+      description: 'Книги, курсы и образовательный контент',
+      features: [
+        'Электронные книги',
+        'Видеокурсы',
+        '3D модели и дизайны',
+        'Подписка на контент',
+        'Авторские роялти'
+      ],
+      status: 'В планах',
+      progress: 0
+    },
+    freelance: {
+      title: 'Биржа труда',
+      icon: 'fa-briefcase',
+      color: 'from-orange-400 to-red-500',
+      description: 'Находите специалистов и заказы',
+      features: [
+        'Профили фрилансеров',
+        'Система заказов',
+        'Безопасные сделки',
+        'Портфолио и кейсы',
+        'Умный подбор исполнителей'
+      ],
+      status: 'В планах',
+      progress: 0
+    },
+    video: {
+      title: 'Видеоконференции',
+      icon: 'fa-video',
+      color: 'from-red-400 to-pink-500',
+      description: 'Групповые звонки и вебинары',
+      features: [
+        'Звонки до 50 участников',
+        'Демонстрация экрана',
+        'Запись конференций',
+        'Виртуальные фоны',
+        'Интеграция с календарем'
+      ],
+      status: 'В планах',
+      progress: 0
+    },
+    donate: {
+      title: 'Система донатов',
+      icon: 'fa-heart',
+      color: 'from-pink-400 to-red-500',
+      description: 'Поддерживайте любимых авторов',
+      features: [
+        'Одноразовые донаты',
+        'Месячные подписки',
+        'Донат-алерты',
+        'NFT награды',
+        'Статистика и аналитика'
+      ],
+      status: 'В планах',
+      progress: 0
+    }
+  };
+  
+  const info = features[feature] || features.wallet;
+  
+  document.getElementById('app').innerHTML = `
+    <div class="flex h-screen">
+      <!-- Keep sidebar -->
+      <div class="${app.menuOpen ? 'w-80' : 'w-16'} bg-telegram-sidebar border-r border-telegram-border flex flex-col transition-all duration-300">
+        <!-- Header -->
+        <div class="p-4 border-b border-telegram-border">
+          <div class="flex items-center ${app.menuOpen ? 'justify-between' : 'justify-center'}">
+            <button onclick="toggleMenu()" class="p-2 hover:bg-telegram-hover rounded" title="Меню">
+              <i class="fas ${app.menuOpen ? 'fa-times' : 'fa-bars'} text-telegram-text"></i>
+            </button>
+            ${app.menuOpen ? `
+              <h1 class="text-lg font-semibold">Кайф Озеро</h1>
+              <button onclick="showSearchModal()" class="p-2 hover:bg-telegram-hover rounded">
+                <i class="fas fa-search text-telegram-secondary"></i>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+        
+        <!-- Ecosystem Menu -->
+        <div class="${app.menuOpen ? 'block' : 'hidden'} border-b border-telegram-border">
+          <nav class="p-2">
+            ${renderEcosystemMenu()}
+          </nav>
+        </div>
+        
+        <!-- Content -->
+        <div id="sidebar-content" class="flex-1 overflow-y-auto">
+          ${app.menuOpen ? renderSidebarContent() : renderCompactMenu()}
+        </div>
+      </div>
+      
+      <!-- Main content - Coming Soon -->
+      <div class="flex-1 overflow-y-auto bg-telegram-bg">
+        <div class="max-w-4xl mx-auto p-8">
+          <!-- Feature Header -->
+          <div class="bg-gradient-to-br ${info.color} rounded-2xl p-8 mb-8 text-white">
+            <div class="flex items-center mb-4">
+              <div class="w-16 h-16 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
+                <i class="fas ${info.icon} text-3xl"></i>
+              </div>
+              <div>
+                <h1 class="text-3xl font-bold">${info.title}</h1>
+                <p class="text-white text-opacity-90">${info.description}</p>
+              </div>
+            </div>
+            
+            <!-- Progress bar -->
+            <div class="mt-6">
+              <div class="flex justify-between text-sm mb-2">
+                <span>Прогресс разработки</span>
+                <span>${info.progress}%</span>
+              </div>
+              <div class="w-full bg-white bg-opacity-20 rounded-full h-2">
+                <div class="bg-white h-2 rounded-full transition-all" style="width: ${info.progress}%"></div>
+              </div>
+              <div class="mt-2 text-sm text-white text-opacity-90">
+                Статус: <span class="font-semibold">${info.status}</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Features Grid -->
+          <div class="grid md:grid-cols-2 gap-4 mb-8">
+            <div class="bg-telegram-sidebar rounded-xl p-6">
+              <h3 class="text-lg font-semibold mb-4 text-telegram-accent">
+                <i class="fas fa-star mr-2"></i>Планируемые функции
+              </h3>
+              <ul class="space-y-2">
+                ${info.features.map(f => `
+                  <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                    <span class="text-telegram-text">${f}</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+            
+            <div class="bg-telegram-sidebar rounded-xl p-6">
+              <h3 class="text-lg font-semibold mb-4 text-telegram-accent">
+                <i class="fas fa-rocket mr-2"></i>Преимущества
+              </h3>
+              <div class="space-y-3">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-telegram-accent bg-opacity-20 rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-shield-alt text-telegram-accent"></i>
+                  </div>
+                  <div>
+                    <div class="font-semibold">Безопасность</div>
+                    <div class="text-sm text-telegram-secondary">End-to-end шифрование</div>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-telegram-accent bg-opacity-20 rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-bolt text-telegram-accent"></i>
+                  </div>
+                  <div>
+                    <div class="font-semibold">Скорость</div>
+                    <div class="text-sm text-telegram-secondary">Мгновенные транзакции</div>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-telegram-accent bg-opacity-20 rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-users text-telegram-accent"></i>
+                  </div>
+                  <div>
+                    <div class="font-semibold">Сообщество</div>
+                    <div class="text-sm text-telegram-secondary">Интеграция с чатами</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Timeline -->
+          <div class="bg-telegram-sidebar rounded-xl p-6 mb-8">
+            <h3 class="text-lg font-semibold mb-4 text-telegram-accent">
+              <i class="fas fa-calendar-alt mr-2"></i>Дорожная карта
+            </h3>
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="w-3 h-3 bg-green-400 rounded-full mt-1.5 mr-3"></div>
+                <div>
+                  <div class="font-semibold">Фаза 1: MVP</div>
+                  <div class="text-sm text-telegram-secondary">Базовый мессенджер - Завершено ✓</div>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-3 h-3 bg-yellow-400 rounded-full mt-1.5 mr-3"></div>
+                <div>
+                  <div class="font-semibold">Фаза 2: Финансы</div>
+                  <div class="text-sm text-telegram-secondary">Криптокошелек и платежи - Q1 2025</div>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-3 h-3 bg-gray-400 rounded-full mt-1.5 mr-3"></div>
+                <div>
+                  <div class="font-semibold">Фаза 3: Маркетплейс</div>
+                  <div class="text-sm text-telegram-secondary">NFT и товары - Q2 2025</div>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-3 h-3 bg-gray-400 rounded-full mt-1.5 mr-3"></div>
+                <div>
+                  <div class="font-semibold">Фаза 4: Социальные функции</div>
+                  <div class="text-sm text-telegram-secondary">Краудфандинг и донаты - Q3 2025</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Call to Action -->
+          <div class="bg-gradient-to-r from-telegram-accent to-blue-600 rounded-xl p-6 text-center">
+            <h3 class="text-xl font-bold text-white mb-2">Хотите ускорить разработку?</h3>
+            <p class="text-white text-opacity-90 mb-4">
+              Присоединяйтесь к нашей команде разработчиков или поддержите проект
+            </p>
+            <div class="flex justify-center space-x-4">
+              <a href="https://github.com/kaiflake2023-a11y/-KAIF-lake" target="_blank" 
+                class="bg-white text-telegram-accent px-6 py-2 rounded-lg font-semibold hover:bg-opacity-90 transition">
+                <i class="fab fa-github mr-2"></i>GitHub
+              </a>
+              <button onclick="switchView('chats')" 
+                class="bg-white bg-opacity-20 text-white px-6 py-2 rounded-lg font-semibold hover:bg-opacity-30 transition">
+                Вернуться к чатам
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // Initialize app on load
