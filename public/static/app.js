@@ -582,6 +582,11 @@ function renderEcosystemMenu() {
     { id: 'wallet', icon: 'fa-wallet', label: 'Кошелек', status: 'soon', color: 'text-yellow-400' },
     { id: 'nft', icon: 'fa-image', label: 'NFT Маркет', status: 'soon', color: 'text-purple-400' },
     { id: 'marketplace', icon: 'fa-shopping-cart', label: 'Маркетплейс', status: 'soon', color: 'text-green-400' },
+    { id: 'dating', icon: 'fa-heart-pulse', label: '💕 Знакомства', status: 'new', color: 'text-red-500' },
+    { id: 'lottery', icon: 'fa-dice', label: '🎰 Лотерея', status: 'new', color: 'text-yellow-500' },
+    { id: 'travel', icon: 'fa-plane', label: '✈️ Путешествия', status: 'new', color: 'text-blue-500' },
+    { id: 'rental', icon: 'fa-key', label: '🚗 Аренда', status: 'new', color: 'text-green-500' },
+    { id: 'events', icon: 'fa-calendar-star', label: '🎉 События', status: 'new', color: 'text-purple-500' },
     { id: 'crowdfunding', icon: 'fa-hand-holding-usd', label: 'Краудфандинг', status: 'planned', color: 'text-blue-400' },
     { id: 'library', icon: 'fa-book', label: 'Библиотека', status: 'planned', color: 'text-indigo-400' },
     { id: 'freelance', icon: 'fa-briefcase', label: 'Биржа труда', status: 'planned', color: 'text-orange-400' },
@@ -603,6 +608,9 @@ function renderEcosystemMenu() {
       ${item.badge ? `
         <span class="bg-telegram-accent text-xs px-2 py-1 rounded-full">${item.badge}</span>
       ` : ''}
+      ${item.status === 'new' ? `
+        <span class="text-xs bg-gradient-to-r from-red-500 to-pink-500 text-white px-2 py-0.5 rounded animate-pulse">new</span>
+      ` : ''}
       ${item.status === 'soon' ? `
         <span class="text-xs bg-yellow-500 bg-opacity-20 text-yellow-400 px-2 py-0.5 rounded">скоро</span>
       ` : ''}
@@ -616,11 +624,13 @@ function renderEcosystemMenu() {
 // Render compact menu when collapsed
 function renderCompactMenu() {
   const menuItems = [
-    { id: 'chats', icon: 'fa-comments', active: true },
-    { id: 'wallet', icon: 'fa-wallet' },
-    { id: 'nft', icon: 'fa-image' },
-    { id: 'marketplace', icon: 'fa-shopping-cart' },
-    { id: 'video', icon: 'fa-video' }
+    { id: 'chats', icon: 'fa-comments', active: true, color: 'text-telegram-accent' },
+    { id: 'wallet', icon: 'fa-wallet', color: 'text-yellow-400' },
+    { id: 'dating', icon: 'fa-heart-pulse', color: 'text-red-500', isNew: true },
+    { id: 'lottery', icon: 'fa-dice', color: 'text-yellow-500', isNew: true },
+    { id: 'travel', icon: 'fa-plane', color: 'text-blue-500', isNew: true },
+    { id: 'rental', icon: 'fa-key', color: 'text-green-500', isNew: true },
+    { id: 'events', icon: 'fa-calendar-star', color: 'text-purple-500', isNew: true }
   ];
   
   return `
@@ -895,6 +905,86 @@ function renderComingSoonView(feature) {
       ],
       status: 'В планах',
       progress: 0
+    },
+    dating: {
+      title: 'КАЙФ-ЗНАКОМСТВА',
+      icon: 'fa-heart-pulse',
+      color: 'from-red-500 to-pink-600',
+      description: 'Найдите свою половинку в экосистеме Кайф Озеро',
+      features: [
+        'Умный алгоритм подбора пар',
+        'Видео-знакомства и виртуальные свидания',
+        'Совместимость по интересам и ценностям',
+        'Верификация профилей и защита от фейков',
+        'События и мероприятия для знакомств',
+        'Icebreakers и игры для начала общения'
+      ],
+      status: 'Новый модуль',
+      progress: 8
+    },
+    lottery: {
+      title: 'КАЙФ-ЛОТЕРЕЯ',
+      icon: 'fa-dice',
+      color: 'from-yellow-500 to-orange-600',
+      description: 'Испытайте удачу в криптолотереях и розыгрышах',
+      features: [
+        'Ежедневные и еженедельные розыгрыши',
+        'Мгновенные лотереи с моментальным выигрышем',
+        'Прозрачность через блокчейн',
+        'Групповые лотереи с друзьями',
+        'NFT и криптовалюта в качестве призов',
+        'Благотворительные лотереи'
+      ],
+      status: 'Новый модуль',
+      progress: 5
+    },
+    travel: {
+      title: 'КАЙФ-ПУТЕШЕСТВИЯ',
+      icon: 'fa-plane',
+      color: 'from-blue-500 to-cyan-600',
+      description: 'Планируйте и бронируйте путешествия с криптооплатой',
+      features: [
+        'Поиск и бронирование авиабилетов',
+        'Отели и апартаменты по всему миру',
+        'Туристические пакеты и экскурсии',
+        'Travel Journal - дневник путешествий',
+        'Групповые поездки с участниками сообщества',
+        'Страхование путешествий в криптовалюте'
+      ],
+      status: 'Новый модуль',
+      progress: 3
+    },
+    rental: {
+      title: 'КАЙФ-АРЕНДА',
+      icon: 'fa-key',
+      color: 'from-green-500 to-teal-600',
+      description: 'Арендуйте автомобили, яхты, недвижимость и технику',
+      features: [
+        'Аренда премиум автомобилей',
+        'Яхты и катера для отдыха',
+        'Квартиры и виллы посуточно',
+        'Техника и оборудование',
+        'Smart-контракты для безопасности сделок',
+        'Система страхования и залогов'
+      ],
+      status: 'Новый модуль',
+      progress: 6
+    },
+    events: {
+      title: 'КАЙФ-СОБЫТИЯ',
+      icon: 'fa-calendar-star',
+      color: 'from-purple-500 to-indigo-600',
+      description: 'Организуйте и посещайте мероприятия',
+      features: [
+        'Концерты и фестивали',
+        'Спортивные события',
+        'Бизнес-конференции и митапы',
+        'Частные вечеринки и встречи',
+        'Продажа билетов в криптовалюте',
+        'QR-коды и NFT-билеты'
+      ],
+      status: 'Новый модуль',
+      progress: 4
     }
   };
   
